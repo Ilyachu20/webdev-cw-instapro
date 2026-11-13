@@ -3,8 +3,12 @@ import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage } from "../index.js";
 
 export function renderPostsPageComponent({ appEl }) {
-  // @TODO: реализовать рендер постов из api
   console.log("Актуальный список постов:", posts);
+
+  /**
+   * @TODO: форматируем дату создания поста относительно текущего времени.
+   * Используем встроенный Intl, чтобы не подключать дополнительную библиотеку.
+   */
   const formatPostDate = (date) => {
     const dateInMilliseconds = new Date(date).getTime();
 
