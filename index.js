@@ -31,7 +31,6 @@ export const logout = () => {
   goToPage(POSTS_PAGE);
 };
 
-
 export const goToPage = (newPage, data) => {
   if (
     [
@@ -109,17 +108,13 @@ const renderApp = () => {
       appEl,
       onAddPostClick({ description, imageUrl }) {
         // @TODO: реализовать добавление поста в API
-        return fetch(
-          "https://webdev-hw-api.vercel.app/api/v1/prod/instapro",
-          {
-            method: "POST",
-            headers: {
-              Authorization: getToken(),
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ description, imageUrl }),
+        return fetch("https://wedev-api.sky.pro/api/v1/prod/instapro", {
+          method: "POST",
+          headers: {
+            Authorization: getToken(),
           },
-        )
+          body: JSON.stringify({ description, imageUrl }),
+        })
           .then((response) => {
             if (!response.ok) {
               throw new Error("Не удалось добавить публикацию");
