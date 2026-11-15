@@ -2,7 +2,7 @@ import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage } from "../index.js";
 
-export function renderPostsPageComponent({ appEl }) {
+export function renderPostsPageComponent({ appEl, onLikeClick }) {
   console.log("Актуальный список постов:", posts);
 
   /**
@@ -101,6 +101,25 @@ export function renderPostsPageComponent({ appEl }) {
     userEl.addEventListener("click", () => {
       goToPage(USER_POSTS_PAGE, {
         userId: userEl.dataset.userId,
+      });
+    });
+  }
+
+  for (let likeButton of document.querySelectorAll(".like-button")) {
+    likeButton.addEventListener("click", () => {
+      const post = posts.find(
+        (post) => String(post.id) === likeButton.dataset.postId,
+      );
+
+      likeButton.disabled = true;
+
+      onLikeClick({
+        postId: likeButton.dataset.postId,
+        isLiked: post.isLiked,
+      }).catch((error) => {
+        console.error(error);
+        likeButton.disabled = false;
+        alert("Не удалось обновить лайк. Попробуйте ещё раз.");
       });
     });
   }

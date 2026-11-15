@@ -42,7 +42,6 @@ export const goToPage = (newPage, data) => {
     ].includes(newPage)
   ) {
     if (newPage === ADD_POSTS_PAGE) {
-      /* Если пользователь не авторизован, то отправляем его на страницу авторизации перед добавлением поста */
       page = user ? ADD_POSTS_PAGE : AUTH_PAGE;
       return renderApp();
     }
@@ -108,6 +107,37 @@ export const goToPage = (newPage, data) => {
 
 const renderApp = () => {
   const appEl = document.getElementById("app");
+
+  const onLikeClick = ({ postId, isLiked }) => {
+    const action = isLiked ? "dislike" : "like";
+
+    return fetch(
+      `https://wedev-api.sky.pro/api/v1/prod/instapro/${postId}/${action}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: getToken(),
+        },
+      },
+    )
+      .then((response) => {
+        if (response.status === 401) {
+          throw new Error("Нет авторизации");
+        }
+
+        if (!response.ok) {
+          throw new Error("Не удалось обновить лайк");
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        posts = posts.map((post) =>
+          String(post.id) === String(postId) ? data.post : post,
+        );
+        renderApp();
+      });
+  };
   if (page === LOADING_PAGE) {
     return renderLoadingPageComponent({
       appEl,
@@ -158,6 +188,7 @@ const renderApp = () => {
   if (page === POSTS_PAGE) {
     return renderPostsPageComponent({
       appEl,
+      onLikeClick,
     });
   }
 
@@ -165,6 +196,7 @@ const renderApp = () => {
     // @TODO: реализовать страницу с фотографиями отдельного пользвателя
     return renderPostsPageComponent({
       appEl,
+      onLikeClick,
     });
   }
 };
