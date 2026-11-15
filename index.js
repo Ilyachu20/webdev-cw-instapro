@@ -65,10 +65,36 @@ export const goToPage = (newPage, data) => {
 
     if (newPage === USER_POSTS_PAGE) {
       // @@TODO: реализовать получение постов юзера из API
-      console.log("Открываю страницу пользователя: ", data.userId);
-      page = USER_POSTS_PAGE;
-      posts = [];
-      return renderApp();
+      page = LOADING_PAGE;
+      renderApp();
+
+      return fetch(
+        `https://wedev-api.sky.pro/api/v1/prod/instapro/user-posts/${data.userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: getToken(),
+          },
+        },
+      )
+        .then((response) => {
+          if (response.status === 401) {
+            throw new Error("Нет авторизации");
+          }
+
+          return response.json();
+        })
+        .then((data) => {
+          page = USER_POSTS_PAGE;
+          posts = data.posts;
+          renderApp();
+        })
+        .catch((error) => {
+          console.error(error);
+          page = USER_POSTS_PAGE;
+          posts = [];
+          renderApp();
+        });
     }
 
     page = newPage;
@@ -137,8 +163,9 @@ const renderApp = () => {
 
   if (page === USER_POSTS_PAGE) {
     // @TODO: реализовать страницу с фотографиями отдельного пользвателя
-    appEl.innerHTML = "Здесь будет страница фотографий пользователя";
-    return;
+    return renderPostsPageComponent({
+      appEl,
+    });
   }
 };
 
